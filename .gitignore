@@ -1,0 +1,6 @@
+*.npy
+.idea/
+MNIST_data/
+resources/
+*.swp
+*.pyc
