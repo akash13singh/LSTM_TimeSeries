@@ -73,7 +73,9 @@ def generate_data(fct, x, time_steps, seperate=False):
     return dict(train=train_x, val=val_x, test=test_x), dict(train=train_y, val=val_y, test=test_y)
 
 
-def lstm_model(num_units, rnn_layers, dense_layers=None, learning_rate=0.1, optimizer='Adagrad'):
+def lstm_model(time_steps, rnn_layers, dense_layers=None, learning_rate=0.1, optimizer='Adagrad'):
+    print time_steps
+    #exit(0)
     """
         Creates a deep model based on:
             * stacked lstm cells
@@ -88,13 +90,12 @@ def lstm_model(num_units, rnn_layers, dense_layers=None, learning_rate=0.1, opti
 
     def lstm_cells(layers):
         if isinstance(layers[0], dict):
-            return [tf.nn.rnn_cell.DropoutWrapper(rnn.BasicLSTMCell(layer['num_units'],
-                                                                               state_is_tuple=True),
-                                                  layer['keep_prob'])
-                    if layer.get('keep_prob') else rnn.BasicLSTMCell(layer['num_units'],
-                                                                                state_is_tuple=True)
+            return [rnn.DropoutWrapper(rnn.BasicLSTMCell(layer['num_units'],state_is_tuple=True),layer['keep_prob'])
+                    if layer.get('keep_prob')
+                    else rnn.BasicLSTMCell(layer['num_units'], state_is_tuple=True)
                     for layer in layers]
-            return [rnn.BasicLSTMCell(steps, state_is_tuple=True) for steps in layers]
+
+        return [rnn.BasicLSTMCell(steps, state_is_tuple=True) for steps in layers]
 
     def dnn_layers(input_layers, layers):
         if layers and isinstance(layers, dict):
@@ -109,7 +110,7 @@ def lstm_model(num_units, rnn_layers, dense_layers=None, learning_rate=0.1, opti
 
     def _lstm_model(X, y):
         stacked_lstm = rnn.MultiRNNCell(lstm_cells(rnn_layers), state_is_tuple=True)
-        x_ =  tf.unstack(X, num=num_units, axis=1)
+        x_ =  tf.unstack(X, num=time_steps, axis=1)
 
         output, layers = rnn.static_rnn(stacked_lstm, x_, dtype=dtypes.float32)
         output = dnn_layers(output[-1], dense_layers)

@@ -8,8 +8,8 @@ from sklearn.metrics import mean_squared_error
 
 from lstm_predictior import generate_data, lstm_model
 LOG_DIR = 'resources/logs/'
-TIMESTEPS = 3
-RNN_LAYERS = [{'num_units': 5}]
+TIMESTEPS = 1
+RNN_LAYERS = [{'num_units': 4}]
 DENSE_LAYERS = None
 TRAINING_STEPS = 100
 PRINT_STEPS = TRAINING_STEPS / 10
